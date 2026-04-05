@@ -2,21 +2,18 @@ import React from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 
 /*
-  Komponen Header
-  Fungsi: menampilkan judul aplikasi dan search makanan
+  Header aplikasi
 */
 
 const Header = () => {
   return (
     <View style={styles.container}>
 
-      {/* Judul aplikasi */}
       <Text style={styles.title}>🍔 AppFoodPicker</Text>
 
-      {/* Search makanan */}
       <TextInput
+        placeholder="Cari makanan..."
         style={styles.search}
-        placeholder="Cari makanan favorit..."
       />
 
     </View>
@@ -28,8 +25,8 @@ export default Header;
 const styles = StyleSheet.create({
 
   container: {
-    padding: 20,
-    backgroundColor: "#ff6b3d"
+    backgroundColor: "#00aa13",
+    padding: 20
   },
 
   title: {

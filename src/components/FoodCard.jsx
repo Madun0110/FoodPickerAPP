@@ -1,54 +1,50 @@
 import React from "react";
-import { View, Text, Image, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity
+} from "react-native";
 
 /*
   Komponen FoodCard
-  Fungsi: menampilkan daftar makanan dengan gambar
+  menerima props foodList dan onFavorite
 */
 
-const FoodCard = () => {
-
-  const foods = [
-    {
-      id: 1,
-      name: "Burger King",
-      rating: "4.8 ⭐",
-      image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd"
-    },
-    {
-      id: 2,
-      name: "Pizza Hut",
-      rating: "4.7 ⭐",
-      image: "https://images.unsplash.com/photo-1593560708920-61dd98c46a4e"
-    },
-    {
-      id: 3,
-      name: "Sushi House",
-      rating: "4.9 ⭐",
-      image: "https://images.unsplash.com/photo-1553621042-f6e147245754"
-    }
-  ];
+const FoodCard = ({ foodList, onFavorite }) => {
 
   return (
     <ScrollView>
 
-      {foods.map((food) => (
+      {foodList.map((food) => (
+
         <View key={food.id} style={styles.card}>
 
-          {/* gambar makanan */}
-          <Image source={{ uri: food.image }} style={styles.image} />
+          {/* gambar makanan dari assets */}
+          <Image source={food.image} style={styles.image} />
+
+          {/* tombol favorit */}
+          <TouchableOpacity
+            style={styles.favorite}
+            onPress={() => onFavorite(food.id)}
+          >
+            <Text style={styles.favoriteText}>
+              {food.favorite ? "❤️" : "🤍"}
+            </Text>
+          </TouchableOpacity>
 
           <View style={styles.info}>
 
-            {/* nama restoran */}
             <Text style={styles.name}>{food.name}</Text>
 
-            {/* rating */}
             <Text style={styles.rating}>{food.rating}</Text>
 
           </View>
 
         </View>
+
       ))}
 
     </ScrollView>
@@ -63,18 +59,31 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     margin: 10,
     borderRadius: 15,
-    elevation: 5
+    elevation: 4
   },
 
   image: {
     width: "100%",
-    height: 150,
+    height: 160,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15
   },
 
+  favorite: {
+    position: "absolute",
+    right: 15,
+    top: 15,
+    backgroundColor: "white",
+    padding: 8,
+    borderRadius: 20
+  },
+
+  favoriteText: {
+    fontSize: 18
+  },
+
   info: {
-    padding: 10
+    padding: 12
   },
 
   name: {
@@ -83,7 +92,8 @@ const styles = StyleSheet.create({
   },
 
   rating: {
-    color: "gray"
+    color: "gray",
+    marginTop: 5
   }
 
 });

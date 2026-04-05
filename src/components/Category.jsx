@@ -1,21 +1,20 @@
 import React from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 
 /*
-  Komponen Category
-  Fungsi: menampilkan kategori makanan
+  Komponen kategori makanan
 */
 
 const Category = () => {
 
-  const categories = ["🍕 Pizza", "🍔 Burger", "🍜 Mie", "🍣 Sushi", "🥗 Salad"];
+  const categories = ["🍔 Burger", "🍕 Pizza", "🍣 Sushi"];
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
 
-      {categories.map((item, index) => (
+      {categories.map((cat, index) => (
         <View key={index} style={styles.card}>
-          <Text style={styles.text}>{item}</Text>
+          <Text>{cat}</Text>
         </View>
       ))}
 
@@ -28,14 +27,11 @@ export default Category;
 const styles = StyleSheet.create({
 
   card: {
-    backgroundColor: "#eee",
+    backgroundColor: "white",
     padding: 10,
+    margin: 10,
     borderRadius: 20,
-    margin: 10
-  },
-
-  text: {
-    fontWeight: "bold"
+    elevation: 2
   }
 
 });
