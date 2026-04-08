@@ -1,89 +1,113 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import {
   View,
   Text,
   Image,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  Animated
 } from "react-native";
 
-/*
-  Komponen FoodCard
-  menerima props foodList dan onFavorite
-*/
+import { Ionicons } from "@expo/vector-icons";
+import { BookmarkContext } from "../Context/BookmarkContext";
 
-const FoodCard = ({ foodList, onFavorite }) => {
+export default function FoodCard({ item }) {
+
+  const { addBookmark, removeBookmark } = useContext(BookmarkContext);
+  const [favorite, setFavorite] = useState(false);
+
+  const scale = new Animated.Value(1);
+
+  const pressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.95,
+      useNativeDriver: true
+    }).start();
+  };
+
+  const pressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true
+    }).start();
+  };
+
+  const toggleFavorite = () => {
+    setFavorite(!favorite);
+
+    if (!favorite) addBookmark(item);
+    else removeBookmark(item.id);
+  };
 
   return (
-    <ScrollView>
+    <Animated.View style={{ transform: [{ scale }] }}>
 
-      {foodList.map((food) => (
+      <TouchableOpacity
+        onPressIn={pressIn}
+        onPressOut={pressOut}
+        style={styles.card}
+      >
 
-        <View key={food.id} style={styles.card}>
+        <Image source={item.image} style={styles.image} />
 
-          {/* gambar makanan dari assets */}
-          <Image source={food.image} style={styles.image} />
+        <TouchableOpacity
+          style={styles.heart}
+          onPress={toggleFavorite}
+        >
 
-          {/* tombol favorit */}
-          <TouchableOpacity
-            style={styles.favorite}
-            onPress={() => onFavorite(food.id)}
-          >
-            <Text style={styles.favoriteText}>
-              {food.favorite ? "❤️" : "🤍"}
-            </Text>
-          </TouchableOpacity>
+          <Ionicons
+            name={favorite ? "heart" : "heart-outline"}
+            size={24}
+            color="red"
+          />
 
-          <View style={styles.info}>
+        </TouchableOpacity>
 
-            <Text style={styles.name}>{food.name}</Text>
+        <View style={styles.info}>
 
-            <Text style={styles.rating}>{food.rating}</Text>
+          <Text style={styles.name}>
+            {item.title}
+          </Text>
 
-          </View>
+          <Text style={styles.rating}>
+            ⭐ {item.rating}
+          </Text>
 
         </View>
 
-      ))}
+      </TouchableOpacity>
 
-    </ScrollView>
+    </Animated.View>
   );
-};
-
-export default FoodCard;
+}
 
 const styles = StyleSheet.create({
 
   card: {
-    backgroundColor: "white",
-    margin: 10,
+    backgroundColor: "#fff",
     borderRadius: 15,
+    marginBottom: 20,
     elevation: 4
   },
 
   image: {
     width: "100%",
-    height: 160,
+    height: 170,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15
   },
 
-  favorite: {
+  heart: {
     position: "absolute",
     right: 15,
     top: 15,
-    backgroundColor: "white",
-    padding: 8,
+    backgroundColor: "#fff",
+    padding: 6,
     borderRadius: 20
   },
 
-  favoriteText: {
-    fontSize: 18
-  },
-
   info: {
-    padding: 12
+    padding: 10
   },
 
   name: {
@@ -92,8 +116,7 @@ const styles = StyleSheet.create({
   },
 
   rating: {
-    color: "gray",
-    marginTop: 5
+    color: "gray"
   }
 
 });

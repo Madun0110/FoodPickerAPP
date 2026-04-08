@@ -1,76 +1,90 @@
-import React, { useState } from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
+import React from "react";
 
-import Header from "./src/components/Header";
-import Category from "./src/components/Category";
-import FoodCard from "./src/components/FoodCard";
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-/*
-  Komponen utama aplikasi
-  Menyimpan data makanan menggunakan STATE
-*/
+import { Ionicons } from "@expo/vector-icons";
+
+import Home from "./src/screens/Home";
+import Discover from "./src/screens/Discover";
+import Bookmark from "./src/screens/Bookmark";
+import Profile from "./src/screens/Profile";
+
+import { BookmarkProvider } from "./src/Context/BookmarkContext";
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-
-  const [foods, setFoods] = useState([
-    {
-      id: 1,
-      name: "Burger King",
-      rating: "4.8 ⭐",
-      image: require("./assets/burger.jpg"),
-      favorite: false
-    },
-    {
-      id: 2,
-      name: "Pizza Hut",
-      rating: "4.7 ⭐",
-      image: require("./assets/pizza.jpg"),
-      favorite: false
-    },
-    {
-      id: 3,
-      name: "Sushi House",
-      rating: "4.9 ⭐",
-      image: require("./assets/sushi.jpg"),
-      favorite: false
-    }
-  ]);
-
-  /*
-    Fungsi untuk mengubah status favorit
-  */
-
-  const toggleFavorite = (id) => {
-
-    const updatedFoods = foods.map((food) =>
-      food.id === id
-        ? { ...food, favorite: !food.favorite }
-        : food
-    );
-
-    setFoods(updatedFoods);
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <BookmarkProvider>
 
-      <Header />
+      <NavigationContainer>
 
-      <Category />
+        <Tab.Navigator
+          screenOptions={({ route }) => ({
 
-      {/* mengirim data ke komponen */}
-      <FoodCard
-        foodList={foods}
-        onFavorite={toggleFavorite}
-      />
+            headerShown: false,
 
-    </SafeAreaView>
+            tabBarStyle: {
+              height: 60,
+              paddingBottom: 5
+            },
+
+            tabBarActiveTintColor: "#ff6b00",
+
+            tabBarIcon: ({ color, size }) => {
+
+              let iconName;
+
+              if (route.name === "Home") {
+                iconName = "home";
+              } 
+              else if (route.name === "Discover") {
+                iconName = "compass";
+              } 
+              else if (route.name === "Bookmark") {
+                iconName = "bookmark";
+              } 
+              else if (route.name === "Profile") {
+                iconName = "person";
+              }
+
+              return (
+                <Ionicons
+                  name={iconName}
+                  size={size}
+                  color={color}
+                />
+              );
+            }
+
+          })}
+        >
+
+          <Tab.Screen
+            name="Home"
+            component={Home}
+          />
+
+          <Tab.Screen
+            name="Discover"
+            component={Discover}
+          />
+
+          <Tab.Screen
+            name="Bookmark"
+            component={Bookmark}
+          />
+
+          <Tab.Screen
+            name="Profile"
+            component={Profile}
+          />
+
+        </Tab.Navigator>
+
+      </NavigationContainer>
+
+    </BookmarkProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f2f2f2"
-  }
-});
