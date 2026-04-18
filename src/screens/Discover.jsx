@@ -1,107 +1,71 @@
 import React from "react";
 import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  TextInput
+View,
+Text,
+StyleSheet,
+FlatList
 } from "react-native";
 
-import { Ionicons } from "@expo/vector-icons";
+import SearchBar from "../components/SearchBar";
+import DiscoverCard from "../components/DiscoverCard";
 
-import CategoryScroll from "../components/CategoryScroll";
-import RestaurantGrid from "../components/RestaurantGrid";
+import { discoverFoods } from "../Data/discoverFoods";
 
-import { blogs } from "../data/blogs";
+/*
+  Screen Discover
+  Fungsi: menampilkan daftar makanan populer
+*/
 
-export default function Discover() {
+export default function Discover({ navigation }){
 
-  return (
-    <ScrollView style={styles.container}>
+return(
 
-      {/* Header */}
-      <Text style={styles.title}>
-        Discover Food
-      </Text>
+<View style={styles.container}>
 
-      {/* Search Bar */}
-      <View style={styles.searchBar}>
+<Text style={styles.title}>
+Discover Food
+</Text>
 
-        <Ionicons name="search" size={20} color="gray" />
+<SearchBar/>
 
-        <TextInput
-          placeholder="Cari restoran atau makanan..."
-          style={styles.input}
-        />
+<FlatList
+data={discoverFoods}
+numColumns={2}
+keyExtractor={(item)=>item.id.toString()}
 
-      </View>
+columnWrapperStyle={{
+justifyContent:"space-between"
+}}
 
-      {/* Kategori */}
-      <Text style={styles.section}>
-        Kategori
-      </Text>
+renderItem={({item}) => (
 
-      <CategoryScroll />
+<DiscoverCard
+item={item}
+onPress={()=>navigation.navigate("FoodDetail",{food:item})}
+/>
 
-      {/* Restoran Populer */}
-      <Text style={styles.section}>
-        Restoran Populer
-      </Text>
+)}
 
-      <View style={styles.grid}>
+/>
 
-        {blogs.map((item) => (
-          <RestaurantGrid
-            key={item.id}
-            item={item}
-          />
-        ))}
+</View>
 
-      </View>
+);
 
-    </ScrollView>
-  );
 }
 
 const styles = StyleSheet.create({
 
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 15
-  },
+container:{
+flex:1,
+backgroundColor:"#f5f5f5",
+padding:15
+},
 
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 15
-  },
-
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 12,
-    marginBottom: 20,
-    elevation: 3
-  },
-
-  input: {
-    marginLeft: 10,
-    flex: 1
-  },
-
-  section: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10
-  },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between"
-  }
+title:{
+fontSize:24,
+fontWeight:"bold",
+marginBottom:10
+}
 
 });

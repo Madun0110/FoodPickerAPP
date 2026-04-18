@@ -1,78 +1,50 @@
 import React from "react";
-import { ScrollView, Text, StyleSheet, View } from "react-native";
+import {
+View,
+FlatList,
+StyleSheet
+} from "react-native";
 
-import PromoBanner from "../components/PromoBanner";
-import CategoryScroll from "../components/CategoryScroll";
 import FoodCard from "../components/FoodCard";
-import RestaurantGrid from "../components/RestaurantGrid";
+import { blogs } from "../Data/blogs";
 
-import { blogs } from "../data/blogs";
+/*
+  Screen Home
+  Fungsi: menampilkan daftar makanan
+*/
 
-export default function Home() {
+export default function Home({ navigation }) {
 
-  return (
-    <ScrollView style={styles.container}>
+return(
 
-      <Text style={styles.title}>
-        🍔 AppFoodPicker
-      </Text>
+<View style={styles.container}>
 
-      <PromoBanner />
+<FlatList
+data={blogs}
+keyExtractor={(item)=>item.id.toString()}
 
-      <Text style={styles.section}>
-        Kategori
-      </Text>
+renderItem={({item}) => (
 
-      <CategoryScroll />
+<FoodCard
+item={item}
+onPress={()=>navigation.navigate("FoodDetail",{food:item})}
+/>
 
-      <Text style={styles.section}>
-        Makanan Populer
-      </Text>
+)}
 
-      {blogs.map((item) => (
-        <FoodCard key={item.id} item={item} />
-      ))}
+/>
 
-      <Text style={styles.section}>
-        Restoran Populer
-      </Text>
+</View>
 
-      <View style={styles.grid}>
-
-        {blogs.map((item) => (
-          <RestaurantGrid key={item.id} item={item} />
-        ))}
-
-      </View>
-
-    </ScrollView>
-  );
+);
 }
 
 const styles = StyleSheet.create({
 
-  container: {
-    flex: 1,
-    padding: 15,
-    backgroundColor: "#f5f5f5"
-  },
-
-  title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 15
-  },
-
-  section: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginVertical: 10
-  },
-
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between"
-  }
+container:{
+flex:1,
+backgroundColor:"#f5f5f5",
+padding:15
+}
 
 });

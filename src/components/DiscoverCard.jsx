@@ -7,12 +7,14 @@ StyleSheet,
 TouchableOpacity
 } from "react-native";
 
+import { Ionicons } from "@expo/vector-icons";
+
 /*
-  Komponen FoodCard
-  Fungsi: menampilkan card makanan
+  Komponen DiscoverCard
+  Fungsi: menampilkan grid makanan
 */
 
-export default function FoodCard({ item, onPress }) {
+export default function DiscoverCard({ item, onPress }) {
 
 return(
 
@@ -32,38 +34,54 @@ style={styles.image}
 {item.title}
 </Text>
 
+<View style={styles.row}>
+
 <Text style={styles.rating}>
 ⭐ {item.rating}
 </Text>
+
+<Ionicons
+name="bookmark-outline"
+size={18}
+/>
+
+</View>
 
 </View>
 
 </TouchableOpacity>
 
 );
+
 }
 
 const styles = StyleSheet.create({
 
 card:{
+width:"48%",
 backgroundColor:"#fff",
-borderRadius:15,
+borderRadius:12,
 marginBottom:15,
 overflow:"hidden"
 },
 
 image:{
 width:"100%",
-height:170
+height:100
 },
 
 info:{
-padding:10
+padding:8
 },
 
 title:{
-fontSize:18,
 fontWeight:"bold"
+},
+
+row:{
+flexDirection:"row",
+justifyContent:"space-between",
+marginTop:5
 },
 
 rating:{

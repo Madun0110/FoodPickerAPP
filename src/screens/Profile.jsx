@@ -1,209 +1,225 @@
-import React, { useState } from "react";
+import React,{useState} from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-  Switch
+View,
+Text,
+StyleSheet,
+Image,
+ScrollView,
+Switch
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import { profileData } from "../data/profiledata";
 
-export default function Profile() {
+export default function Profile(){
 
-  const [darkMode, setDarkMode] = useState(false);
+const [darkMode,setDarkMode] = useState(false);
 
-  const theme = {
-    background: darkMode ? "#121212" : "#f5f5f5",
-    card: darkMode ? "#1e1e1e" : "#fff",
-    text: darkMode ? "#fff" : "#000"
-  };
+return(
 
-  return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.background }]}>
+<ScrollView style={styles.container}>
 
-      {/* HEADER */}
-      <View style={styles.header}>
+{/* HEADER PROFILE */}
 
-        <Image
-          source={require("../../assets/madun.jpeg")}
-          style={styles.avatar}
-        />
+<View style={styles.header}>
 
-        <View style={styles.userInfo}>
-          <Text style={styles.name}>{profileData.name}</Text>
-          <Text style={styles.university}>{profileData.university}</Text>
-        </View>
+<Image
+source={require("../../assets/madun.jpeg")}
+style={styles.avatar}
+/>
 
-      </View>
+<View style={styles.info}>
 
-      {/* STATISTIK */}
-      <View style={[styles.statsContainer, { backgroundColor: theme.card }]}>
+<Text style={styles.name}>
+Madun King
+</Text>
 
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>24</Text>
-          <Text style={styles.statText}>Orders</Text>
-        </View>
+<Text style={styles.email}>
+madun@email.com
+</Text>
 
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>10</Text>
-          <Text style={styles.statText}>Favorites</Text>
-        </View>
+</View>
 
-        <View style={styles.statItem}>
-          <Text style={styles.statNumber}>5</Text>
-          <Text style={styles.statText}>Reviews</Text>
-        </View>
+<Ionicons name="settings-outline" size={24}/>
 
-      </View>
+</View>
 
-      {/* WALLET */}
-      <View style={[styles.card, { backgroundColor: theme.card }]}>
 
-        <Text style={styles.sectionTitle}>Wallet</Text>
+{/* USER STATISTICS */}
 
-        <View style={styles.menuItem}>
-          <Ionicons name="wallet-outline" size={22} />
-          <Text style={styles.menuText}>Saldo : Rp150.000</Text>
-        </View>
+<View style={styles.statsContainer}>
 
-        <View style={styles.menuItem}>
-          <Ionicons name="ticket-outline" size={22} />
-          <Text style={styles.menuText}>Voucher Makanan</Text>
-        </View>
+<View style={styles.statBox}>
+<Text style={styles.statNumber}>24</Text>
+<Text style={styles.statText}>Orders</Text>
+</View>
 
-      </View>
+<View style={styles.statBox}>
+<Text style={styles.statNumber}>12</Text>
+<Text style={styles.statText}>Favorites</Text>
+</View>
 
-      {/* ORDER HISTORY */}
-      <View style={[styles.card, { backgroundColor: theme.card }]}>
+<View style={styles.statBox}>
+<Text style={styles.statNumber}>8</Text>
+<Text style={styles.statText}>Reviews</Text>
+</View>
 
-        <Text style={styles.sectionTitle}>Order History</Text>
+</View>
 
-        <View style={styles.menuItem}>
-          <Ionicons name="restaurant-outline" size={22} />
-          <Text style={styles.menuText}>Burger Special</Text>
-        </View>
 
-        <View style={styles.menuItem}>
-          <Ionicons name="pizza-outline" size={22} />
-          <Text style={styles.menuText}>Pizza Italian</Text>
-        </View>
+{/* WALLET CARD */}
 
-        <View style={styles.menuItem}>
-          <Ionicons name="fish-outline" size={22} />
-          <Text style={styles.menuText}>Sushi Jepang</Text>
-        </View>
+<View style={styles.walletCard}>
 
-      </View>
+<Ionicons name="wallet" size={30} color="#fff"/>
 
-      {/* DARK MODE */}
-      <View style={[styles.card, { backgroundColor: theme.card }]}>
+<View style={{marginLeft:10}}>
 
-        <View style={styles.menuItem}>
+<Text style={styles.walletTitle}>
+Food Wallet
+</Text>
 
-          <Ionicons name="moon-outline" size={22} />
+<Text style={styles.walletBalance}>
+Rp 150.000
+</Text>
 
-          <Text style={styles.menuText}>Dark Mode</Text>
+</View>
 
-          <Switch
-            value={darkMode}
-            onValueChange={() => setDarkMode(!darkMode)}
-            style={{ marginLeft: "auto" }}
-          />
+</View>
 
-        </View>
 
-      </View>
+{/* MENU LIST */}
 
-    </ScrollView>
-  );
+<View style={styles.menu}>
+
+<View style={styles.menuItem}>
+<Ionicons name="gift-outline" size={22}/>
+<Text style={styles.menuText}>Food Voucher</Text>
+</View>
+
+<View style={styles.menuItem}>
+<Ionicons name="time-outline" size={22}/>
+<Text style={styles.menuText}>Order History</Text>
+</View>
+
+<View style={styles.menuItem}>
+<Ionicons name="heart-outline" size={22}/>
+<Text style={styles.menuText}>Favorite Foods</Text>
+</View>
+
+<View style={styles.menuItem}>
+
+<Ionicons name="moon-outline" size={22}/>
+<Text style={styles.menuText}>Dark Mode</Text>
+
+<Switch
+value={darkMode}
+onValueChange={()=>setDarkMode(!darkMode)}
+/>
+
+</View>
+
+</View>
+
+</ScrollView>
+
+)
+
 }
 
 const styles = StyleSheet.create({
 
-  container: {
-    flex: 1
-  },
+container:{
+flex:1,
+backgroundColor:"#f5f5f5"
+},
 
-  header: {
-    backgroundColor: "#ff6b00",
-    padding: 25,
-    flexDirection: "row",
-    alignItems: "center",
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25
-  },
+header:{
+flexDirection:"row",
+alignItems:"center",
+justifyContent:"space-between",
+padding:20
+},
 
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    borderWidth: 2,
-    borderColor: "#fff"
-  },
+avatar:{
+width:70,
+height:70,
+borderRadius:40
+},
 
-  userInfo: {
-    marginLeft: 15
-  },
+info:{
+flex:1,
+marginLeft:10
+},
 
-  name: {
-    color: "#fff",
-    fontSize: 20,
-    fontWeight: "bold"
-  },
+name:{
+fontSize:18,
+fontWeight:"bold"
+},
 
-  university: {
-    color: "#fff"
-  },
+email:{
+color:"gray"
+},
 
-  statsContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    margin: 15,
-    borderRadius: 15,
-    padding: 15,
-    elevation: 3
-  },
+statsContainer:{
+flexDirection:"row",
+justifyContent:"space-around",
+backgroundColor:"#fff",
+margin:15,
+padding:15,
+borderRadius:15
+},
 
-  statItem: {
-    alignItems: "center"
-  },
+statBox:{
+alignItems:"center"
+},
 
-  statNumber: {
-    fontSize: 20,
-    fontWeight: "bold"
-  },
+statNumber:{
+fontSize:18,
+fontWeight:"bold"
+},
 
-  statText: {
-    color: "gray"
-  },
+statText:{
+color:"gray"
+},
 
-  card: {
-    marginHorizontal: 15,
-    marginBottom: 15,
-    borderRadius: 15,
-    padding: 15,
-    elevation: 3
-  },
+walletCard:{
+flexDirection:"row",
+alignItems:"center",
+backgroundColor:"#ff6b6b",
+marginHorizontal:15,
+padding:20,
+borderRadius:15
+},
 
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10
-  },
+walletTitle:{
+color:"#fff",
+fontSize:16
+},
 
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10
-  },
+walletBalance:{
+color:"#fff",
+fontWeight:"bold",
+fontSize:18
+},
 
-  menuText: {
-    marginLeft: 12,
-    fontSize: 16
-  }
+menu:{
+backgroundColor:"#fff",
+margin:15,
+padding:15,
+borderRadius:15
+},
+
+menuItem:{
+flexDirection:"row",
+alignItems:"center",
+justifyContent:"space-between",
+marginBottom:18
+},
+
+menuText:{
+flex:1,
+marginLeft:10,
+fontSize:16
+}
 
 });

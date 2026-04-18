@@ -1,13 +1,13 @@
 /*
-  Data makanan
-  Fungsi: menyimpan daftar makanan yang akan ditampilkan
+  Data makanan favorit
+  Fungsi: menyimpan daftar bookmark makanan
 */
 
-export const blogs = [
+export const bookmarkFoods = [
 
 {
 id:1,
-title:"Delicious Pizza",
+title:"Italian Pizza",
 rating:"4.8",
 image: require("../../assets/pizza.jpg")
 },
