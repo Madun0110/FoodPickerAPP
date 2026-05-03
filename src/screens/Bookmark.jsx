@@ -1,62 +1,57 @@
-import React from "react";
-import {
-View,
-Text,
-FlatList,
-StyleSheet
-} from "react-native";
+import React, { useRef } from "react";
+import { Animated } from "react-native";
 
 import BookmarkCard from "../components/BookmarkCard";
 import { bookmarkFoods } from "../Data/bookmarkFoods";
 
-/*
-  Screen Bookmark
-  Fungsi: menampilkan daftar makanan favorit
-*/
+export default function Bookmark({ navigation }){
 
-export default function Bookmark({ navigation }) {
+const scrollY = useRef(new Animated.Value(0)).current;
 
 return(
 
-<View style={styles.container}>
-
-<Text style={styles.title}>
-My Favorite Foods
-</Text>
-
-<FlatList
+<Animated.FlatList
 data={bookmarkFoods}
 keyExtractor={(item)=>item.id.toString()}
 
-renderItem={({item}) => (
+onScroll={Animated.event(
+[{ nativeEvent: { contentOffset: { y: scrollY } } }],
+{ useNativeDriver: true }
+)}
+
+renderItem={({item,index}) => {
+
+const inputRange = [
+(index - 1) * 200,
+index * 200,
+(index + 1) * 200
+];
+
+const scale = scrollY.interpolate({
+inputRange,
+outputRange:[0.9,1,0.9],
+extrapolate:"clamp"
+});
+
+return(
+
+<Animated.View style={{
+transform:[{ scale }]
+}}>
 
 <BookmarkCard
 item={item}
 onPress={()=>navigation.navigate("FoodDetail",{food:item})}
 />
 
-)}
-
-/>
-
-</View>
+</Animated.View>
 
 );
 
+}}
+
+contentContainerStyle={{padding:15}}
+/>
+
+);
 }
-
-const styles = StyleSheet.create({
-
-container:{
-flex:1,
-backgroundColor:"#f5f5f5",
-padding:15
-},
-
-title:{
-fontSize:24,
-fontWeight:"bold",
-marginBottom:15
-}
-
-});

@@ -1,24 +1,65 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import {
 View,
 Text,
 Image,
 StyleSheet,
-TouchableOpacity
+TouchableOpacity,
+Animated
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 
 /*
   Komponen BookmarkCard
-  Fungsi: menampilkan makanan favorit
+  Fungsi: menampilkan makanan favorit + animasi
 */
 
 export default function BookmarkCard({ item, onPress }) {
 
+const scaleAnim = useRef(new Animated.Value(1)).current;
+const fadeAnim = useRef(new Animated.Value(0)).current;
+
+/* Animasi muncul (fade in) */
+useEffect(() => {
+  Animated.timing(fadeAnim, {
+    toValue: 1,
+    duration: 600,
+    useNativeDriver: true
+  }).start();
+}, []);
+
+/* Animasi tekan */
+const pressIn = () => {
+  Animated.spring(scaleAnim, {
+    toValue: 0.95,
+    useNativeDriver: true
+  }).start();
+};
+
+const pressOut = () => {
+  Animated.spring(scaleAnim, {
+    toValue: 1,
+    useNativeDriver: true
+  }).start();
+};
+
 return(
 
-<TouchableOpacity style={styles.card} onPress={onPress}>
+<Animated.View
+style={{
+opacity: fadeAnim,
+transform: [{ scale: scaleAnim }]
+}}
+>
+
+<TouchableOpacity
+style={styles.card}
+onPress={onPress}
+onPressIn={pressIn}
+onPressOut={pressOut}
+activeOpacity={0.9}
+>
 
 <Image source={item.image} style={styles.image}/>
 
@@ -45,6 +86,8 @@ color="#fff"
 </View>
 
 </TouchableOpacity>
+
+</Animated.View>
 
 );
 

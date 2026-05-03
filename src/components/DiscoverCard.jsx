@@ -58,10 +58,10 @@ size={18}
 const styles = StyleSheet.create({
 
 card:{
-width:"48%",
+width:"100%",
 backgroundColor:"#fff",
 borderRadius:12,
-marginBottom:15,
+marginBottom:10,
 overflow:"hidden"
 },
 

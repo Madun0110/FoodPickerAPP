@@ -1,71 +1,45 @@
-import React from "react";
+import React,{useEffect,useRef} from "react";
 import {
 View,
-Text,
+FlatList,
 StyleSheet,
-FlatList
+Animated
 } from "react-native";
 
-import SearchBar from "../components/SearchBar";
 import DiscoverCard from "../components/DiscoverCard";
-
 import { discoverFoods } from "../Data/discoverFoods";
-
-/*
-  Screen Discover
-  Fungsi: menampilkan daftar makanan populer
-*/
 
 export default function Discover({ navigation }){
 
+const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+useEffect(()=>{
+Animated.spring(scaleAnim,{
+toValue:1,
+useNativeDriver:true
+}).start();
+},[]);
+
 return(
 
-<View style={styles.container}>
-
-<Text style={styles.title}>
-Discover Food
-</Text>
-
-<SearchBar/>
+<Animated.View style={{
+flex:1,
+transform:[{scale:scaleAnim}]
+}}>
 
 <FlatList
 data={discoverFoods}
 numColumns={2}
 keyExtractor={(item)=>item.id.toString()}
-
-columnWrapperStyle={{
-justifyContent:"space-between"
-}}
-
-renderItem={({item}) => (
-
+renderItem={({item})=>(
 <DiscoverCard
 item={item}
 onPress={()=>navigation.navigate("FoodDetail",{food:item})}
 />
-
 )}
-
 />
 
-</View>
+</Animated.View>
 
 );
-
 }
-
-const styles = StyleSheet.create({
-
-container:{
-flex:1,
-backgroundColor:"#f5f5f5",
-padding:15
-},
-
-title:{
-fontSize:24,
-fontWeight:"bold",
-marginBottom:10
-}
-
-});
