@@ -10,77 +10,119 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-  Text
+  Text,
+  Alert,
+  Keyboard
 } from "react-native";
 
 import FoodCard from "../components/FoodCard";
 
-/* import API */
-import { getFoods } from "../api/foodApi";
+// pastikan getFoods sudah di-import sesuai lokasi file kamu
+// import { getFoods } from "../services/FoodService";
 
 export default function Home({ navigation }) {
 
   const scrollY = useRef(new Animated.Value(0)).current;
 
-  /* state foods */
   const [foods, setFoods] = useState([]);
 
-  /* FORM STATE */
   const [foodName, setFoodName] = useState("");
   const [foodImage, setFoodImage] = useState("");
 
-  /* GET API */
+  const [foodNameError, setFoodNameError] = useState("");
+  const [foodImageError, setFoodImageError] = useState("");
+
   useEffect(() => {
-
     fetchFoods();
-
   }, []);
 
   const fetchFoods = async () => {
-
     try {
-
       const data = await getFoods();
-
       console.log(data);
-
       setFoods(data);
-
-    } catch(error){
-
+    } catch (error) {
       console.log(error);
-
     }
-
   };
 
-  /* TAMBAH DATA */
-  const handleAddFood = () => {
+  const validateImageUrl = (url) => {
+    if (!url) return true;
 
-    if(!foodName){
-      alert("Nama makanan wajib diisi");
-      return;
+    const urlPattern = /^(https?:\/\/).+\.(jpg|jpeg|png|webp|gif)$/i;
+    return urlPattern.test(url);
+  };
+
+  const handleFoodNameChange = (text) => {
+    setFoodName(text);
+
+    if (text.trim().length === 0) {
+      setFoodNameError("Nama makanan wajib diisi");
+    } else if (text.trim().length < 3) {
+      setFoodNameError("Nama makanan minimal 3 karakter");
+    } else {
+      setFoodNameError("");
     }
+  };
+
+  const handleFoodImageChange = (text) => {
+    setFoodImage(text);
+
+    if (text.trim() !== "" && !validateImageUrl(text.trim())) {
+      setFoodImageError("URL gambar harus valid, contoh: https://contoh.com/gambar.jpg");
+    } else {
+      setFoodImageError("");
+    }
+  };
+
+  const handleAddFood = () => {
+    const name = foodName.trim();
+    const image = foodImage.trim();
+
+    let isValid = true;
+
+    if (name.length === 0) {
+      setFoodNameError("Nama makanan wajib diisi");
+      isValid = false;
+    } else if (name.length < 3) {
+      setFoodNameError("Nama makanan minimal 3 karakter");
+      isValid = false;
+    }
+
+    if (image !== "" && !validateImageUrl(image)) {
+      setFoodImageError("URL gambar harus valid");
+      isValid = false;
+    }
+
+    if (!isValid) return;
 
     const newFood = {
       id: Date.now(),
-      name: foodName,
-      image:
-        foodImage ||
-        "https://picsum.photos/400"
+      name: name,
+      image: image || "https://picsum.photos/400"
     };
 
     setFoods([newFood, ...foods]);
 
     setFoodName("");
     setFoodImage("");
+    setFoodNameError("");
+    setFoodImageError("");
+
+    Keyboard.dismiss();
+
+    Alert.alert("Berhasil", "Data makanan berhasil ditambahkan");
   };
 
-  return(
+  const isButtonDisabled =
+    foodName.trim().length < 3 ||
+    foodNameError !== "" ||
+    foodImageError !== "";
 
-    <View style={{ flex:1 }}>
+  return (
 
-      {/* FORM */}
+    <View style={{ flex: 1 }}>
+
       <View style={styles.formContainer}>
 
         <Text style={styles.title}>
@@ -89,21 +131,45 @@ export default function Home({ navigation }) {
 
         <TextInput
           placeholder="Nama makanan"
-          style={styles.input}
+          style={[
+            styles.input,
+            foodNameError ? styles.inputError : null
+          ]}
           value={foodName}
-          onChangeText={setFoodName}
+          onChangeText={handleFoodNameChange}
+          autoCapitalize="words"
+          returnKeyType="next"
         />
+
+        {foodNameError ? (
+          <Text style={styles.errorText}>{foodNameError}</Text>
+        ) : null}
 
         <TextInput
           placeholder="URL gambar makanan"
-          style={styles.input}
+          style={[
+            styles.input,
+            foodImageError ? styles.inputError : null
+          ]}
           value={foodImage}
-          onChangeText={setFoodImage}
+          onChangeText={handleFoodImageChange}
+          autoCapitalize="none"
+          keyboardType="url"
+          returnKeyType="done"
+          onSubmitEditing={handleAddFood}
         />
 
+        {foodImageError ? (
+          <Text style={styles.errorText}>{foodImageError}</Text>
+        ) : null}
+
         <TouchableOpacity
-          style={styles.button}
+          style={[
+            styles.button,
+            isButtonDisabled && styles.buttonDisabled
+          ]}
           onPress={handleAddFood}
+          disabled={isButtonDisabled}
         >
           <Text style={styles.buttonText}>
             Tambah
@@ -112,19 +178,16 @@ export default function Home({ navigation }) {
 
       </View>
 
-
       <Animated.FlatList
 
         data={foods}
 
-        /* FIX ERROR */
-        keyExtractor={(item,index)=>
+        keyExtractor={(item, index) =>
           (item?.id || index).toString()
         }
 
         showsVerticalScrollIndicator={false}
 
-        /* scroll animation */
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
@@ -132,10 +195,9 @@ export default function Home({ navigation }) {
 
         scrollEventThrottle={16}
 
-        renderItem={({item,index}) => {
+        renderItem={({ item, index }) => {
 
-          /* kalau item kosong */
-          if(!item) return null;
+          if (!item) return null;
 
           const ITEM_HEIGHT = 220;
 
@@ -145,61 +207,51 @@ export default function Home({ navigation }) {
             (index + 1) * ITEM_HEIGHT
           ];
 
-          /* fade */
           const opacity = scrollY.interpolate({
             inputRange,
-            outputRange:[0.3,1,0.3],
-            extrapolate:"clamp"
+            outputRange: [0.3, 1, 0.3],
+            extrapolate: "clamp"
           });
 
-          /* scale */
           const scale = scrollY.interpolate({
             inputRange,
-            outputRange:[0.9,1,0.9],
-            extrapolate:"clamp"
+            outputRange: [0.9, 1, 0.9],
+            extrapolate: "clamp"
           });
 
-          /* parallax */
           const translateY = scrollY.interpolate({
             inputRange,
-            outputRange:[50,0,-50],
-            extrapolate:"clamp"
+            outputRange: [50, 0, -50],
+            extrapolate: "clamp"
           });
 
-          return(
+          return (
 
             <Animated.View style={{
               opacity,
-              transform:[{ scale }]
+              transform: [{ scale }]
             }}>
 
-              {/* IMAGE PARALLAX */}
               <View style={styles.imageWrapper}>
 
                 <Animated.Image
-
                   source={{
-                    uri:
-                    item.image ||
-                    "https://picsum.photos/400"
+                    uri: item.image || "https://picsum.photos/400"
                   }}
-
                   style={[
                     styles.image,
                     {
-                      transform:[{ translateY }]
+                      transform: [{ translateY }]
                     }
                   ]}
-
                 />
 
               </View>
 
-              {/* FOOD CARD */}
               <FoodCard
                 item={item}
                 onPress={() =>
-                  navigation.navigate("FoodDetail",{food:item})
+                  navigation.navigate("FoodDetail", { food: item })
                 }
               />
 
@@ -210,8 +262,8 @@ export default function Home({ navigation }) {
         }}
 
         contentContainerStyle={{
-          padding:15,
-          paddingTop:10
+          padding: 15,
+          paddingTop: 10
         }}
 
       />
@@ -224,48 +276,63 @@ export default function Home({ navigation }) {
 
 const styles = StyleSheet.create({
 
-  formContainer:{
-    padding:15,
-    backgroundColor:"#fff"
+  formContainer: {
+    padding: 15,
+    backgroundColor: "#fff"
   },
 
-  title:{
-    fontSize:22,
-    fontWeight:"bold",
-    marginBottom:10
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10
   },
 
-  input:{
-    borderWidth:1,
-    borderColor:"#ccc",
-    borderRadius:10,
-    padding:12,
-    marginBottom:10
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 5
   },
 
-  button:{
-    backgroundColor:"#ff7f50",
-    padding:14,
-    borderRadius:10,
-    alignItems:"center"
+  inputError: {
+    borderColor: "red"
   },
 
-  buttonText:{
-    color:"#fff",
-    fontWeight:"bold",
-    fontSize:16
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10
   },
 
-  imageWrapper:{
-    height:150,
-    overflow:"hidden",
-    borderRadius:15,
-    marginBottom:10
+  button: {
+    backgroundColor: "#ff7f50",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 5
   },
 
-  image:{
-    width:"100%",
-    height:"100%"
+  buttonDisabled: {
+    backgroundColor: "#ccc"
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
+  },
+
+  imageWrapper: {
+    height: 150,
+    overflow: "hidden",
+    borderRadius: 15,
+    marginBottom: 10
+  },
+
+  image: {
+    width: "100%",
+    height: "100%"
   }
 
 });

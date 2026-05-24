@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Animated } from "react-native";
+import { Animated , FlatList} from "react-native";
 
 import BookmarkCard from "../components/BookmarkCard";
 import { bookmarkFoods } from "../Data/bookmarkFoods";
