@@ -1,8 +1,6 @@
 import React,{useEffect,useRef} from "react";
+
 import {
-View,
-FlatList,
-StyleSheet,
 Animated
 } from "react-native";
 
@@ -14,32 +12,47 @@ export default function Discover({ navigation }){
 const scaleAnim = useRef(new Animated.Value(0.9)).current;
 
 useEffect(()=>{
+
 Animated.spring(scaleAnim,{
 toValue:1,
 useNativeDriver:true
 }).start();
+
 },[]);
 
 return(
 
 <Animated.View style={{
 flex:1,
-transform:[{scale:scaleAnim}]
+transform:[{ scale:scaleAnim }]
 }}>
 
 <FlatList
 data={discoverFoods}
-numColumns={2}
-keyExtractor={(item)=>item.id.toString()}
+
+/* FIX ERROR */
+keyExtractor={(item,index)=>
+(item?.id || index).toString()
+}
+
+/* HAPUS numColumns BIAR KE BAWAH */
+showsVerticalScrollIndicator={false}
+
 renderItem={({item})=>(
+
 <DiscoverCard
 item={item}
-onPress={()=>navigation.navigate("FoodDetail",{food:item})}
+onPress={()=>
+navigation.navigate("FoodDetail",{food:item})
+}
 />
+
 )}
+
 />
 
 </Animated.View>
 
 );
+
 }
