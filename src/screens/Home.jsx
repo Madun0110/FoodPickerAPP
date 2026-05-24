@@ -439,9 +439,14 @@ export default function Home({ navigation }) {
           (item?.id || index).toString()
         }
         renderItem={renderItem}
-        ListHeaderComponent={renderForm}
+
+        // UBAH BAGIAN INI
+        ListHeaderComponent={renderForm()}
+
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="none"
+        removeClippedSubviews={false}
         ListFooterComponent={
           loading ? (
             <ActivityIndicator
