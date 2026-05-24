@@ -279,66 +279,66 @@ export default function Home({ navigation }) {
     );
 
   }
+}
+const styles = StyleSheet.create({
 
-  const styles = StyleSheet.create({
+  formContainer: {
+    padding: 15,
+    backgroundColor: "#fff"
+  },
 
-    formContainer: {
-      padding: 15,
-      backgroundColor: "#fff"
-    },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
 
-    title: {
-      fontSize: 22,
-      fontWeight: "bold",
-      marginBottom: 10
-    },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 5
+  },
 
-    input: {
-      borderWidth: 1,
-      borderColor: "#ccc",
-      borderRadius: 10,
-      padding: 12,
-      marginBottom: 5
-    },
+  inputError: {
+    borderColor: "red"
+  },
 
-    inputError: {
-      borderColor: "red"
-    },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10
+  },
 
-    errorText: {
-      color: "red",
-      fontSize: 12,
-      marginBottom: 10
-    },
+  button: {
+    backgroundColor: "#ff7f50",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 5
+  },
 
-    button: {
-      backgroundColor: "#ff7f50",
-      padding: 14,
-      borderRadius: 10,
-      alignItems: "center",
-      marginTop: 5
-    },
+  buttonDisabled: {
+    backgroundColor: "#ccc"
+  },
 
-    buttonDisabled: {
-      backgroundColor: "#ccc"
-    },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
+  },
 
-    buttonText: {
-      color: "#fff",
-      fontWeight: "bold",
-      fontSize: 16
-    },
+  imageWrapper: {
+    height: 150,
+    overflow: "hidden",
+    borderRadius: 15,
+    marginBottom: 10
+  },
 
-    imageWrapper: {
-      height: 150,
-      overflow: "hidden",
-      borderRadius: 15,
-      marginBottom: 10
-    },
+  image: {
+    width: "100%",
+    height: "100%"
+  }
 
-    image: {
-      width: "100%",
-      height: "100%"
-    }
-
-  });
+});
