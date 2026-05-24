@@ -1,55 +1,74 @@
-const API_URL = "https://6a129b8678d0434e0d5d4e4f.mockapi.io/tb_food";
+import { supabase } from "../lib/supabase";
+
+const TABLE_NAME = "tb_food";
 
 export const getFoods = async () => {
-    const response = await fetch(API_URL);
+    const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .select("*")
+        .order("id", { ascending: false });
 
-    if (!response.ok) {
+    if (error) {
         throw new Error("Gagal mengambil data makanan");
     }
 
-    return await response.json();
+    return data;
 };
 
 export const addFood = async (food) => {
-    const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(food),
-    });
+    const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .insert([
+            {
+                name: food.name,
+                category: food.category,
+                price: food.price,
+                description: food.description,
+                image: food.image,
+            },
+        ])
+        .select()
+        .single();
 
-    if (!response.ok) {
+    if (error) {
         throw new Error("Gagal menambahkan data makanan");
     }
 
-    return await response.json();
+    return data;
 };
 
 export const updateFood = async (id, food) => {
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: "PUT",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(food),
-    });
+    const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .update({
+            name: food.name,
+            category: food.category,
+            price: food.price,
+            description: food.description,
+            image: food.image,
+        })
+        .eq("id", id)
+        .select()
+        .single();
 
-    if (!response.ok) {
+    if (error) {
         throw new Error("Gagal mengubah data makanan");
     }
 
-    return await response.json();
+    return data;
 };
 
 export const deleteFood = async (id) => {
-    const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-    });
+    const { data, error } = await supabase
+        .from(TABLE_NAME)
+        .delete()
+        .eq("id", id)
+        .select()
+        .single();
 
-    if (!response.ok) {
+    if (error) {
         throw new Error("Gagal menghapus data makanan");
     }
 
-    return await response.json();
+    return data;
 };

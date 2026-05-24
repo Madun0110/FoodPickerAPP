@@ -8,8 +8,11 @@ import {
     StyleSheet,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from "react-native";
+
+import { loginUser } from "../services/AuthService";
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -18,23 +21,28 @@ export default function LoginScreen({ navigation }) {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
-    const handleLogin = () => {
+    const [loading, setLoading] = useState(false);
+
+    const handleLogin = async () => {
         let isValid = true;
 
-        if (email.trim() === "") {
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanPassword = password.trim();
+
+        if (cleanEmail === "") {
             setEmailError("Email wajib diisi");
             isValid = false;
-        } else if (!email.includes("@")) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
             setEmailError("Format email tidak valid");
             isValid = false;
         } else {
             setEmailError("");
         }
 
-        if (password.trim() === "") {
+        if (cleanPassword === "") {
             setPasswordError("Password wajib diisi");
             isValid = false;
-        } else if (password.length < 6) {
+        } else if (cleanPassword.length < 6) {
             setPasswordError("Password minimal 6 karakter");
             isValid = false;
         } else {
@@ -43,9 +51,25 @@ export default function LoginScreen({ navigation }) {
 
         if (!isValid) return;
 
-        Alert.alert("Berhasil", "Login berhasil");
+        try {
+            setLoading(true);
 
-        navigation.replace("MainTabs");
+            await loginUser(cleanEmail, cleanPassword);
+
+            Alert.alert("Berhasil", "Login berhasil");
+
+            navigation.replace("MainTabs");
+
+        } catch (error) {
+            console.log("LOGIN ERROR:", error);
+
+            Alert.alert(
+                "Login Gagal",
+                error.message
+            );
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -92,15 +116,24 @@ export default function LoginScreen({ navigation }) {
                 ) : null}
 
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[
+                        styles.button,
+                        loading && styles.buttonDisabled
+                    ]}
                     onPress={handleLogin}
+                    disabled={loading}
                 >
-                    <Text style={styles.buttonText}>Login</Text>
+                    {loading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>Login</Text>
+                    )}
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.linkButton}
                     onPress={() => navigation.navigate("Register")}
+                    disabled={loading}
                 >
                     <Text style={styles.linkText}>
                         Belum punya akun? Daftar
@@ -175,6 +208,10 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: "center",
         marginTop: 8
+    },
+
+    buttonDisabled: {
+        backgroundColor: "#ccc"
     },
 
     buttonText: {

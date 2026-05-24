@@ -1,18 +1,105 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
 import {
     View,
     Text,
     StyleSheet,
     Image,
     ScrollView,
-    Switch
+    Switch,
+    ActivityIndicator,
+    Alert,
+    TouchableOpacity
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 
-export default function Profile() {
+import { supabase } from "../lib/supabase";
+import { logoutUser } from "../services/AuthService";
+
+export default function Profile({ navigation }) {
 
     const [darkMode, setDarkMode] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const [profile, setProfile] = useState({
+        name: "",
+        email: "",
+        photo_url: "",
+        order: 0,
+        favorite: 0,
+        review: 0,
+    });
+
+    useEffect(() => {
+        getProfile();
+    }, []);
+
+    const getProfile = async () => {
+        try {
+            setLoading(true);
+
+            const { data: userData, error: userError } =
+                await supabase.auth.getUser();
+
+            if (userError) {
+                throw new Error(userError.message);
+            }
+
+            const user = userData.user;
+
+            if (!user) {
+                throw new Error("User belum login");
+            }
+
+            const { data, error } = await supabase
+                .from("users")
+                .select("name, email, photo_url, order, favorite, review")
+                .eq("id", user.id)
+                .maybeSingle();
+
+            if (error) {
+                throw new Error(error.message);
+            }
+
+            setProfile({
+                name: data?.name || user.user_metadata?.name || "User",
+                email: data?.email || user.email || "-",
+                photo_url: data?.photo_url || "",
+                order: data?.order || 0,
+                favorite: data?.favorite || 0,
+                review: data?.review || 0,
+            });
+
+        } catch (error) {
+            Alert.alert("Error", error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            await logoutUser();
+
+            navigation
+                .getParent()
+                ?.getParent()
+                ?.replace("Login");
+
+        } catch (error) {
+            Alert.alert("Logout Gagal", error.message);
+        }
+    };
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#ff7f50" />
+                <Text style={styles.loadingText}>Memuat profil...</Text>
+            </View>
+        );
+    }
 
     return (
 
@@ -23,18 +110,22 @@ export default function Profile() {
             <View style={styles.header}>
 
                 <Image
-                    source={require("../../assets/madun.jpeg")}
+                    source={
+                        profile.photo_url
+                            ? { uri: profile.photo_url }
+                            : require("../../assets/madun.jpeg")
+                    }
                     style={styles.avatar}
                 />
 
                 <View style={styles.info}>
 
                     <Text style={styles.name}>
-                        Madun King
+                        {profile.name}
                     </Text>
 
                     <Text style={styles.email}>
-                        madun@email.com
+                        {profile.email}
                     </Text>
 
                 </View>
@@ -49,17 +140,23 @@ export default function Profile() {
             <View style={styles.statsContainer}>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>24</Text>
+                    <Text style={styles.statNumber}>
+                        {profile.order}
+                    </Text>
                     <Text style={styles.statText}>Orders</Text>
                 </View>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>12</Text>
+                    <Text style={styles.statNumber}>
+                        {profile.favorite}
+                    </Text>
                     <Text style={styles.statText}>Favorites</Text>
                 </View>
 
                 <View style={styles.statBox}>
-                    <Text style={styles.statNumber}>8</Text>
+                    <Text style={styles.statNumber}>
+                        {profile.review}
+                    </Text>
                     <Text style={styles.statText}>Reviews</Text>
                 </View>
 
@@ -118,6 +215,14 @@ export default function Profile() {
 
                 </View>
 
+                <TouchableOpacity
+                    style={styles.logoutButton}
+                    onPress={handleLogout}
+                >
+                    <Ionicons name="log-out-outline" size={22} color="#fff" />
+                    <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
+
             </View>
 
         </ScrollView>
@@ -131,6 +236,18 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f5f5f5"
+    },
+
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#f5f5f5"
+    },
+
+    loadingText: {
+        marginTop: 10,
+        color: "gray"
     },
 
     header: {
@@ -220,6 +337,23 @@ const styles = StyleSheet.create({
         flex: 1,
         marginLeft: 10,
         fontSize: 16
+    },
+
+    logoutButton: {
+        flexDirection: "row",
+        backgroundColor: "#e74c3c",
+        padding: 14,
+        borderRadius: 12,
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 5
+    },
+
+    logoutText: {
+        color: "#fff",
+        fontWeight: "bold",
+        fontSize: 16,
+        marginLeft: 8
     }
 
 });

@@ -8,8 +8,11 @@ import {
     StyleSheet,
     KeyboardAvoidingView,
     Platform,
-    Alert
+    Alert,
+    ActivityIndicator
 } from "react-native";
+
+import { registerUser } from "../services/AuthService";
 
 export default function RegisterScreen({ navigation }) {
     const [name, setName] = useState("");
@@ -20,33 +23,39 @@ export default function RegisterScreen({ navigation }) {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
 
-    const handleRegister = () => {
+    const [loading, setLoading] = useState(false);
+
+    const handleRegister = async () => {
         let isValid = true;
 
-        if (name.trim() === "") {
+        const cleanName = name.trim();
+        const cleanEmail = email.trim().toLowerCase();
+        const cleanPassword = password.trim();
+
+        if (cleanName === "") {
             setNameError("Nama wajib diisi");
             isValid = false;
-        } else if (name.trim().length < 3) {
+        } else if (cleanName.length < 3) {
             setNameError("Nama minimal 3 karakter");
             isValid = false;
         } else {
             setNameError("");
         }
 
-        if (email.trim() === "") {
+        if (cleanEmail === "") {
             setEmailError("Email wajib diisi");
             isValid = false;
-        } else if (!email.includes("@")) {
-            setEmailError("Format email tidak valid");
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+            setEmailError("Format email tidak valid. Contoh: nama@gmail.com");
             isValid = false;
         } else {
             setEmailError("");
         }
 
-        if (password.trim() === "") {
+        if (cleanPassword === "") {
             setPasswordError("Password wajib diisi");
             isValid = false;
-        } else if (password.length < 6) {
+        } else if (cleanPassword.length < 6) {
             setPasswordError("Password minimal 6 karakter");
             isValid = false;
         } else {
@@ -55,11 +64,33 @@ export default function RegisterScreen({ navigation }) {
 
         if (!isValid) return;
 
-        Alert.alert("Berhasil", "Register berhasil, silakan login");
+        try {
+            setLoading(true);
 
-        navigation.replace("Login");
+            await registerUser(
+                cleanName,
+                cleanEmail,
+                cleanPassword
+            );
+
+            Alert.alert(
+                "Berhasil",
+                "Register berhasil, silakan login"
+            );
+
+            navigation.replace("Login");
+
+        } catch (error) {
+            console.log("REGISTER ERROR:", error);
+
+            Alert.alert(
+                "Register Gagal",
+                error.message
+            );
+        } finally {
+            setLoading(false);
+        }
     };
-
     return (
         <KeyboardAvoidingView
             style={styles.container}
@@ -119,15 +150,24 @@ export default function RegisterScreen({ navigation }) {
                 ) : null}
 
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[
+                        styles.button,
+                        loading && styles.buttonDisabled
+                    ]}
                     onPress={handleRegister}
+                    disabled={loading}
                 >
-                    <Text style={styles.buttonText}>Register</Text>
+                    {loading ? (
+                        <ActivityIndicator color="#fff" />
+                    ) : (
+                        <Text style={styles.buttonText}>Register</Text>
+                    )}
                 </TouchableOpacity>
 
                 <TouchableOpacity
                     style={styles.linkButton}
                     onPress={() => navigation.navigate("Login")}
+                    disabled={loading}
                 >
                     <Text style={styles.linkText}>
                         Sudah punya akun? Login
@@ -202,6 +242,10 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         alignItems: "center",
         marginTop: 8
+    },
+
+    buttonDisabled: {
+        backgroundColor: "#ccc"
     },
 
     buttonText: {
