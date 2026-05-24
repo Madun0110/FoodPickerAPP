@@ -1,116 +1,338 @@
-import React, { useRef } from "react";
+import React, {
+  useRef,
+  useEffect,
+  useState
+} from "react";
+
 import {
-Animated,
-View,
-StyleSheet,
-Image
+  Animated,
+  View,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  Text,
+  Alert,
+  Keyboard
 } from "react-native";
 
 import FoodCard from "../components/FoodCard";
-import { blogs } from "../Data/blogs";
+
+// pastikan getFoods sudah di-import sesuai lokasi file kamu
+// import { getFoods } from "../services/FoodService";
 
 export default function Home({ navigation }) {
 
-const scrollY = useRef(new Animated.Value(0)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
 
-return(
+  const [foods, setFoods] = useState([]);
 
-<Animated.FlatList
-data={blogs}
-keyExtractor={(item)=>item.id.toString()}
+  const [foodName, setFoodName] = useState("");
+  const [foodImage, setFoodImage] = useState("");
 
-showsVerticalScrollIndicator={false}
+  const [foodNameError, setFoodNameError] = useState("");
+  const [foodImageError, setFoodImageError] = useState("");
 
-/* Scroll tracking */
-onScroll={Animated.event(
-[{ nativeEvent: { contentOffset: { y: scrollY } } }],
-{ useNativeDriver: true }
-)}
+  useEffect(() => {
+    fetchFoods();
+  }, []);
 
-scrollEventThrottle={16}
+  const fetchFoods = async () => {
+    try {
+      const data = await getFoods();
+      console.log(data);
+      setFoods(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-renderItem={({item, index}) => {
+  const validateImageUrl = (url) => {
+    if (!url) return true;
 
-/* ukuran card */
-const ITEM_HEIGHT = 200;
+    const urlPattern = /^(https?:\/\/).+\.(jpg|jpeg|png|webp|gif)$/i;
+    return urlPattern.test(url);
+  };
 
-const inputRange = [
-(index - 1) * ITEM_HEIGHT,
-index * ITEM_HEIGHT,
-(index + 1) * ITEM_HEIGHT
-];
+  const handleFoodNameChange = (text) => {
+    setFoodName(text);
 
-/* fade */
-const opacity = scrollY.interpolate({
-inputRange,
-outputRange: [0.3, 1, 0.3],
-extrapolate: "clamp"
-});
+    if (text.trim().length === 0) {
+      setFoodNameError("Nama makanan wajib diisi");
+    } else if (text.trim().length < 3) {
+      setFoodNameError("Nama makanan minimal 3 karakter");
+    } else {
+      setFoodNameError("");
+    }
+  };
 
-/* scale */
-const scale = scrollY.interpolate({
-inputRange,
-outputRange: [0.9, 1, 0.9],
-extrapolate: "clamp"
-});
+  const handleFoodImageChange = (text) => {
+    setFoodImage(text);
 
-/* parallax image */
-const translateY = scrollY.interpolate({
-inputRange,
-outputRange: [50, 0, -50],
-extrapolate: "clamp"
-});
+    if (text.trim() !== "" && !validateImageUrl(text.trim())) {
+      setFoodImageError("URL gambar harus valid, contoh: https://contoh.com/gambar.jpg");
+    } else {
+      setFoodImageError("");
+    }
+  };
 
-return(
+  const handleAddFood = () => {
+    const name = foodName.trim();
+    const image = foodImage.trim();
 
-<Animated.View style={{
-opacity,
-transform:[{ scale }]
-}}>
+    let isValid = true;
 
-{/* Parallax Image Wrapper */}
-<View style={styles.imageWrapper}>
+    if (name.length === 0) {
+      setFoodNameError("Nama makanan wajib diisi");
+      isValid = false;
+    } else if (name.length < 3) {
+      setFoodNameError("Nama makanan minimal 3 karakter");
+      isValid = false;
+    }
 
-<Animated.Image
-source={item.image}
-style={[
-styles.image,
-{ transform: [{ translateY }] }
-]}
-/>
+    if (image !== "" && !validateImageUrl(image)) {
+      setFoodImageError("URL gambar harus valid");
+      isValid = false;
+    }
 
-</View>
+    if (!isValid) return;
 
-{/* Card */}
-<FoodCard
-item={item}
-onPress={()=>navigation.navigate("FoodDetail",{food:item})}
-/>
+    const newFood = {
+      id: Date.now(),
+      name: name,
+      image: image || "https://picsum.photos/400"
+    };
 
-</Animated.View>
+    setFoods([newFood, ...foods]);
 
-);
+    setFoodName("");
+    setFoodImage("");
+    setFoodNameError("");
+    setFoodImageError("");
 
-}}
+    Keyboard.dismiss();
 
-contentContainerStyle={{padding:15}}
-/>
+    Alert.alert("Berhasil", "Data makanan berhasil ditambahkan");
+  };
 
-);
+  const isButtonDisabled =
+    foodName.trim().length < 3 ||
+    foodNameError !== "" ||
+    foodImageError !== "";
+
+  return (
+
+    <View style={{ flex: 1 }}>
+
+      <View style={styles.formContainer}>
+
+        <Text style={styles.title}>
+          Tambah Makanan
+        </Text>
+
+        <TextInput
+          placeholder="Nama makanan"
+          style={[
+            styles.input,
+            foodNameError ? styles.inputError : null
+          ]}
+          value={foodName}
+          onChangeText={handleFoodNameChange}
+          autoCapitalize="words"
+          returnKeyType="next"
+        />
+
+        {foodNameError ? (
+          <Text style={styles.errorText}>{foodNameError}</Text>
+        ) : null}
+
+        <TextInput
+          placeholder="URL gambar makanan"
+          style={[
+            styles.input,
+            foodImageError ? styles.inputError : null
+          ]}
+          value={foodImage}
+          onChangeText={handleFoodImageChange}
+          autoCapitalize="none"
+          keyboardType="url"
+          returnKeyType="done"
+          onSubmitEditing={handleAddFood}
+        />
+
+        {foodImageError ? (
+          <Text style={styles.errorText}>{foodImageError}</Text>
+        ) : null}
+
+        <TouchableOpacity
+          style={[
+            styles.button,
+            isButtonDisabled && styles.buttonDisabled
+          ]}
+          onPress={handleAddFood}
+          disabled={isButtonDisabled}
+        >
+          <Text style={styles.buttonText}>
+            Tambah
+          </Text>
+        </TouchableOpacity>
+
+      </View>
+
+      <Animated.FlatList
+
+        data={foods}
+
+        keyExtractor={(item, index) =>
+          (item?.id || index).toString()
+        }
+
+        showsVerticalScrollIndicator={false}
+
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+
+        scrollEventThrottle={16}
+
+        renderItem={({ item, index }) => {
+
+          if (!item) return null;
+
+          const ITEM_HEIGHT = 220;
+
+          const inputRange = [
+            (index - 1) * ITEM_HEIGHT,
+            index * ITEM_HEIGHT,
+            (index + 1) * ITEM_HEIGHT
+          ];
+
+          const opacity = scrollY.interpolate({
+            inputRange,
+            outputRange: [0.3, 1, 0.3],
+            extrapolate: "clamp"
+          });
+
+          const scale = scrollY.interpolate({
+            inputRange,
+            outputRange: [0.9, 1, 0.9],
+            extrapolate: "clamp"
+          });
+
+          const translateY = scrollY.interpolate({
+            inputRange,
+            outputRange: [50, 0, -50],
+            extrapolate: "clamp"
+          });
+
+          return (
+
+            <Animated.View style={{
+              opacity,
+              transform: [{ scale }]
+            }}>
+
+              <View style={styles.imageWrapper}>
+
+                <Animated.Image
+                  source={{
+                    uri: item.image || "https://picsum.photos/400"
+                  }}
+                  style={[
+                    styles.image,
+                    {
+                      transform: [{ translateY }]
+                    }
+                  ]}
+                />
+
+              </View>
+
+              <FoodCard
+                item={item}
+                onPress={() =>
+                  navigation.navigate("FoodDetail", { food: item })
+                }
+              />
+
+            </Animated.View>
+
+          );
+
+        }}
+
+        contentContainerStyle={{
+          padding: 15,
+          paddingTop: 10
+        }}
+
+      />
+
+    </View>
+
+  );
+
 }
 
 const styles = StyleSheet.create({
 
-imageWrapper:{
-height:150,
-overflow:"hidden",
-borderRadius:15,
-marginBottom:10
-},
+  formContainer: {
+    padding: 15,
+    backgroundColor: "#fff"
+  },
 
-image:{
-width:"100%",
-height:"100%"
-}
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10
+  },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 5
+  },
+
+  inputError: {
+    borderColor: "red"
+  },
+
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10
+  },
+
+  button: {
+    backgroundColor: "#ff7f50",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 5
+  },
+
+  buttonDisabled: {
+    backgroundColor: "#ccc"
+  },
+
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
+  },
+
+  imageWrapper: {
+    height: 150,
+    overflow: "hidden",
+    borderRadius: 15,
+    marginBottom: 10
+  },
+
+  image: {
+    width: "100%",
+    height: "100%"
+  }
 
 });

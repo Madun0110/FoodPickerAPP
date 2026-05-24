@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from "react";
+
 import {
 View,
 Text,
@@ -18,56 +19,76 @@ export default function FoodCard({ item, onPress }) {
 const scaleAnim = useRef(new Animated.Value(1)).current;
 const fadeAnim = useRef(new Animated.Value(0)).current;
 
-/* Animasi muncul */
-useEffect(() => {
-  Animated.timing(fadeAnim, {
-    toValue: 1,
-    duration: 600,
-    useNativeDriver: true
-  }).start();
-}, []);
 
-/* Animasi tekan */
+/* animasi muncul */
+useEffect(() => {
+
+Animated.timing(fadeAnim,{
+toValue:1,
+duration:600,
+useNativeDriver:true
+}).start();
+
+},[]);
+
+
+/* animasi tekan */
 const pressIn = () => {
-  Animated.spring(scaleAnim, {
-    toValue: 0.96,
-    useNativeDriver: true
-  }).start();
+
+Animated.spring(scaleAnim,{
+toValue:0.96,
+useNativeDriver:true
+}).start();
+
 };
+
 
 const pressOut = () => {
-  Animated.spring(scaleAnim, {
-    toValue: 1,
-    useNativeDriver: true
-  }).start();
+
+Animated.spring(scaleAnim,{
+toValue:1,
+useNativeDriver:true
+}).start();
+
 };
+
 
 return(
 
 <Animated.View
 style={{
-opacity: fadeAnim,
-transform: [{ scale: scaleAnim }]
+opacity:fadeAnim,
+transform:[{ scale:scaleAnim }]
 }}
 >
 
 <TouchableOpacity
+
 style={styles.card}
+
 onPress={onPress}
+
 onPressIn={pressIn}
+
 onPressOut={pressOut}
+
 activeOpacity={0.9}
+
 >
 
+{/* IMAGE DARI REST API */}
 <Image
-source={item.image}
+
+source={{ uri: item.image }}
+
 style={styles.image}
+
 />
 
 <View style={styles.info}>
 
 <Text style={styles.title}>
-{item.title}
+{item.name}
 </Text>
 
 <Text style={styles.rating}>
@@ -84,6 +105,7 @@ style={styles.image}
 
 }
 
+
 const styles = StyleSheet.create({
 
 card:{
@@ -91,7 +113,7 @@ backgroundColor:"#fff",
 borderRadius:15,
 marginBottom:15,
 overflow:"hidden",
-elevation:3   // biar lebih modern (shadow Android)
+elevation:4
 },
 
 image:{
@@ -112,4 +134,4 @@ rating:{
 color:"gray"
 }
 
-});   
+});

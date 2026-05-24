@@ -3,49 +3,49 @@ import { View, Text, Image, StyleSheet } from "react-native";
 
 export default function FoodDetail({ route }) {
 
-const { food } = route.params;
+    const { food } = route.params;
 
-return(
+    return (
 
-<View style={styles.container}>
+        <View style={styles.container}>
 
-<Image
-source={food.image}
-style={styles.image}
-/>
+            <Image
+                source={food.image}
+                style={styles.image}
+            />
 
-<Text style={styles.title}>
-{food.title}
-</Text>
+            <Text style={styles.title}>
+                {food.title}
+            </Text>
 
-<Text>
-⭐ {food.rating}
-</Text>
+            <Text>
+                ⭐ {food.rating}
+            </Text>
 
-</View>
+        </View>
 
-);
+    );
 
 }
 
 const styles = StyleSheet.create({
 
-container:{
-flex:1,
-alignItems:"center",
-justifyContent:"center"
-},
+    container: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center"
+    },
 
-image:{
-width:300,
-height:200,
-borderRadius:15
-},
+    image: {
+        width: 300,
+        height: 200,
+        borderRadius: 15
+    },
 
-title:{
-fontSize:24,
-fontWeight:"bold",
-marginTop:10
-}
+    title: {
+        fontSize: 24,
+        fontWeight: "bold",
+        marginTop: 10
+    }
 
 });
